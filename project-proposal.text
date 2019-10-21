@@ -1,0 +1,45 @@
+Comp50 CP Project Proposal
+10/20/2019
+
+1) What is your team name?
+Wikicrawlers
+
+2) Who's in the group?
+Andrew Gross, Trung Truong, Benjamin Auerbach
+
+3) What's the project?
+Our project is a concurrent web-crawling system to compile graphs of Wikipedia
+pages. The goals are to discover the average degree of separation between any
+two Wikipedia pages and to visualize the graphs created. The web-crawlers will
+run concurrently on a subset of Wikipedia pages, beginning with some given
+origin page and moving to each Wikipedia link on each page crawled within some
+bounds.
+
+4) What's the minimum/maximum deliverable?
+The minimum deliverable is a program that uses concurrent web-crawlers to
+create a graph of Wikipedia page link connections.
+
+The maximum deliverable would include an interactive visualization of the graph
+and would perform some graph algorithms (Dijkstra, etc...) to inform us more
+about Wikipedia's structure. It may also be able to find the minimum distance
+between any two pages (AKA the Wikipedia Game).
+
+We could also make the web-crawlers distributed, especially if we get blocked
+by Wikipedia for sending too many requests. We could have one computer compile
+the data and others doing the web-crawling.
+
+5) What's your first step?
+Building a sequential web crawler that can interact with Wikipedia and index
+links. Store the result in a file.
+
+6) What's the biggest problem you foresee or question you need to answer to get
+started?
+a) How can we stop two crawlers from indexing the same page / creating duplicate
+nodes? Use a hash table?
+
+b) How can we handle the exponential growth of the sites the crawlers will
+need to visit? We will need to cap the number of threads / total pages visited
+somehow.
+
+c) What if we get blocked by Wikipedia for sending too many requests? Maybe we
+will make it distributed if we get blocked.
