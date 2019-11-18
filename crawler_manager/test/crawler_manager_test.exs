@@ -7,6 +7,10 @@ defmodule CrawlerManagerTest do
   end
 
   test "greets the world with python" do
-    assert CrawlerManager.python_hello() == :python_hello
+    assert CrawlerManager.test_python_hello() == :test_python_hello
+  end
+
+  test "testing map translation between python and elixir using json" do
+    assert CrawlerManager.test_python_dict() == :test_python_dict
   end
 end
