@@ -27,10 +27,8 @@ def back_trace(parent, start, end):
     path = [end]
     while path[-1] != start:
         path.append(parent[path[-1]])
-        print(path)
     path.reverse()
     return path
-
 
 def bfs(graph, start, end):
     start_url = BASE_URL + start
@@ -64,7 +62,6 @@ def bfs(graph, start, end):
         neighbors = graph[curr_link] if curr_link in graph else []
         
         for neighbor in neighbors:
-
             if neighbor not in visited:
                 queue.append(neighbor)
                 parent[neighbor] = curr_link
