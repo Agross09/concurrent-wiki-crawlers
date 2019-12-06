@@ -7,7 +7,7 @@
 #  crawls Wikipedia sites and updates their graph relationship 
 #  using an adjacency matrix
 #  
-#--------------------------------------------------------------]
+#---------------------------------------------------------------
 from bs4 import BeautifulSoup
 import requests
 import sys
