@@ -3,9 +3,9 @@
 #
 #  File name: viz.py
 #
-#  Description: Implementation of graph visualization using 
+#  Description: Implementation of graph visualization using
 #  NetworkX package
-#  
+#
 #---------------------------------------------------------------
 import sys
 import json
@@ -13,10 +13,23 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 def main(file_name):
+    # Generate graph from json file
     json_file = open(file_name)
     adjacency_matrix = json.load(json_file)
     G = nx.from_dict_of_lists(adjacency_matrix)
-    
+
+    color_map = set_node_colors(G)
+
+    # Generate and show visualization
+    nx.draw(
+        G, with_labels=False,
+        node_color=color_map, node_size=150,
+        edge_color='grey', alpha=0.3
+    )
+    plt.show()
+
+def set_node_colors(G):
+    """Set node color based on the number of neighbors it has"""
     color_map = []
     for node in G:
         if len(G[node]) < 2:
@@ -29,13 +42,7 @@ def main(file_name):
             color_map.append('#0000ff')
         else:
             color_map.append('#ff0000')
-
-    nx.draw(
-        G, with_labels=False, 
-        node_color=color_map, node_size=150,
-        edge_color='grey', alpha=0.3
-    )
-    plt.show()
+    return color_map
 
 if __name__ == '__main__':
     main(sys.argv[1])
