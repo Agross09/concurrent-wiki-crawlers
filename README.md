@@ -47,7 +47,8 @@ python3 src/viz.py graph_small.json
 
 ## Sample graphs
 
-<img src="https://github.com/ttrung149/concurrent-wiki-crawlers/blob/crawler/media/graph-viz-2.png" width="40%">.
+<img src="https://github.com/ttrung149/concurrent-wiki-crawlers/blob/crawler/media/graph-viz-1.png" width="50%">.
+<img src="https://github.com/ttrung149/concurrent-wiki-crawlers/blob/crawler/media/graph-viz-2.png" width="50%">.
 
 ## Authors
 
