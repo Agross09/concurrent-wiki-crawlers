@@ -1,15 +1,12 @@
 defmodule CrawlerManager.PageQueue do
   use GenServer
+  require Logger
 
   @moduledoc """
   Documentation for CrawlerManager.PageQueue
 
   Each instance of this module is a GenServer that facilitates a queue.
   This queue stores the pages that the crawlers will eventually explore.
-  """
-
-  @moduledoc """
-  External API for CrawlerManager.PageQueue
   """
 
   @doc """
@@ -22,6 +19,8 @@ defmodule CrawlerManager.PageQueue do
   """
   def start_link(urls) when is_list(urls) do
     {:ok, _pid} = GenServer.start_link(__MODULE__, urls)
+    Logger.info "PageQueue started! and my PID is " <> Kernel.inspect(self())
+    {:ok, _pid}
   end
 
   @doc """
@@ -33,6 +32,7 @@ defmodule CrawlerManager.PageQueue do
   by dequeuing a page from pageQueue queue and return the page.
   """
   def get_new_page(queue_pid) do
+    # Logger.debug "Call to get_new_page >>>"
     GenServer.call(queue_pid, :get_new_page)
   end
 
@@ -51,22 +51,42 @@ defmodule CrawlerManager.PageQueue do
     GenServer.cast(queue_pid, {:put_page, new_page, graph_pid})
   end
 
+  @doc """
+  Function: len/1
+
+  Function to return the length of the queue pageQueue.
+  """
+  def len(queue_pid) do
+    GenServer.call(queue_pid, :len)
+  end
+
   #############################################################################
   # GenServer Implementation
 
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
+
   # GenServer handle_call for getting a new page from the queue pageQueue.
   def handle_call(:get_new_page, _from, pageQueue) do
+    #Logger.debug "<<< Handling call to get new page from: "
+    #  <> Kernel.inspect(from)
     {page, updatedQueue} = get_new_page_aux(pageQueue)
     {:reply, page, updatedQueue}
+  end
+
+  # Returns the length of the queue
+  def handle_call(:len, _from, pageQueue) do
+    {:reply, length(pageQueue), pageQueue}
   end
 
   # GenServer handle_cast for putting a new page into the queue pageQueue.
   # Checks to see if the page is unexplored (not a key in graph pageGraph).
   def handle_cast({:put_page, new_page, graph_pid}, pageQueue) do
+    # Logger.info "New page added! " <> Kernel.inspect(new_page)
     updatedQueue = put_page_aux(new_page, graph_pid, pageQueue)
     {:noreply, updatedQueue}
   end
-
 
   #############################################################################
   # Helper functions

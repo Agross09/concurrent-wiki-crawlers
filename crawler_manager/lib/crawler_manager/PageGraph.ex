@@ -1,5 +1,6 @@
 defmodule CrawlerManager.PageGraph do
   use GenServer
+  require Logger
 
   @moduledoc """
   Documentation for CrawlerManager.PageGraph
@@ -7,10 +8,6 @@ defmodule CrawlerManager.PageGraph do
   Each instance of this module is a GenServer that facilitates a graph.
   This graph is the state of the subgraph of Wikipedia pages received from the
   python crawlers.
-  """
-
-  @moduledoc """
-  External API for CrawlerManager.PageGraph
   """
 
   @doc """
@@ -21,7 +18,7 @@ defmodule CrawlerManager.PageGraph do
   Given a page (url string), start a GenServer process and map of lists for
   each page and its neighbors (list of url strings).
   """
-  def start_link(originPage) when is_string(originPage) do
+  def start_link(originPage) when is_binary(originPage) do
     pageGraph = %{originPage => []}
     {:ok, _pid} = GenServer.start_link(__MODULE__, pageGraph)
   end
@@ -36,7 +33,13 @@ defmodule CrawlerManager.PageGraph do
   edge between the two given pages.
   """
   def put_edge(graph_pid, originPage, nextPage) do
-    GenServer.cast(graph_pid, {:put_edge, originPage, nextPage})
+    case GenServer.cast(graph_pid, {:put_edge, originPage, nextPage}) do
+      :ok -> nextPage
+      _ ->
+        Logger.error("Error putting edge between " <>
+          Kernel.inspect(originPage) <> " and " <> Kernel.inspect(originPage))
+        :error
+    end
   end
 
   @doc """
@@ -65,7 +68,7 @@ defmodule CrawlerManager.PageGraph do
   to the graph pageGraph.
   """
   def add_subgraph(graph_pid, urls_subgraph) when is_map(urls_subgraph) do
-    Enum.map(
+    m = Enum.map(
       urls_subgraph,
       fn {base_url, neighbors} ->
         Enum.map(
@@ -75,10 +78,36 @@ defmodule CrawlerManager.PageGraph do
           end
         )
       end
-    )
+    ) |> List.flatten
+    # Someone is returning :ok and not the url!!
+    # Logger.debug Kernel.inspect(m)
+    m
+  end
+
+  @doc """
+  Function: get_graph/1
+
+  Function to return pageGraph graph.
+  """
+  def get_graph(graph_pid) do
+    GenServer.call(graph_pid, :get_graph)
+  end
+
+  @doc """
+  Function: print_graph_to_file/2
+
+  Function to print pageGraph graph to a given path.
+  """
+  def print_graph_to_file(graph_pid, path) do
+    GenServer.cast(graph_pid, {:print_graph, path})
   end
   #############################################################################
   # GenServer Implementation
+
+  def init(init_arg) do
+    Logger.info "I am the PageGraph and my PID is: " <> Kernel.inspect(self())
+    {:ok, init_arg}
+  end
 
   # GenServer handle_cast for putting an edge between two pages in the graph.
   def handle_cast({:put_edge, originPage, nextPage}, pageGraph) do
@@ -90,6 +119,16 @@ defmodule CrawlerManager.PageGraph do
   # as a key in the pageGraph.
   def handle_call({:is_duplicate, page}, _from, pageGraph) do
     {:reply, is_duplicate_aux(page, pageGraph), pageGraph}
+  end
+
+  # Returns PageGraph graph
+  def handle_call(:get_graph, _from, pageGraph) do
+    {:reply, pageGraph, pageGraph}
+  end
+
+  def handle_cast({:print_graph, path}, pageGraph) do
+    print_graph_to_file_aux(path, pageGraph)
+    {:noreply, pageGraph}
   end
 
   #############################################################################
@@ -116,5 +155,12 @@ defmodule CrawlerManager.PageGraph do
   # Checks if a given page (url string) is a key in the pageGraph map.
   defp is_duplicate_aux(page, pageGraph) do
     Enum.member?(Map.keys(pageGraph), page)
+  end
+
+  defp print_graph_to_file_aux(path, pageGraph) do
+    if !File.exists?(path), do: File.touch(path)
+    File.open(path, [:write], fn file ->
+      IO.write(file, Kernel.inspect(pageGraph))
+    end)
   end
 end
