@@ -19,14 +19,25 @@ def main(file_name):
     G = nx.from_dict_of_lists(adjacency_matrix)
 
     color_map = set_node_colors(G)
-
+    labels = label_important(G)
     # Generate and show visualization
+    pos = nx.spring_layout(G)
     nx.draw(
         G, with_labels=False,
         node_color=color_map, node_size=150,
-        edge_color='grey', alpha=0.3
+        edge_color='grey', alpha=0.3,
+        pos=pos
     )
+    nx.draw_networkx_labels(G,pos=pos,labels=labels)
     plt.show()
+
+def label_important(G):
+    """Only add page labels for nodes with > 20 neighbors"""
+    labels = {}
+    for node in G:
+        if len(G[node]) > 20:
+            labels[node] = node.split("wiki/")[1]
+    return labels
 
 def set_node_colors(G):
     """Set node color based on the number of neighbors it has"""
