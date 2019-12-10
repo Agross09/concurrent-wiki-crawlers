@@ -18,9 +18,10 @@ instructions to install dependencies.
 pip3 install -r requirements.txt
 ```
 
-To run the concurrent crawler,
+To run the concurrent crawler, (-s defualt 1000, -t default 20)
 ```
-python3 src/concurrent-spider.py <starting wikipedia url>
+python3 src/concurrent-spider.py <starting wikipedia url> -t
+        <number crawler threads> -s <number sites to crawl>
 ```
 
 To run the breath-first-search algorithm on a graph,
