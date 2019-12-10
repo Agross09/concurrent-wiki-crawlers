@@ -160,7 +160,7 @@ defmodule CrawlerManager.PageGraph do
   defp print_graph_to_file_aux(path, pageGraph) do
     if !File.exists?(path), do: File.touch(path)
     File.open(path, [:write], fn file ->
-      IO.write(file, Kernel.inspect(pageGraph))
+      IO.write(file, Kernel.inspect(Poison.encode!(pageGraph)))
     end)
   end
 end

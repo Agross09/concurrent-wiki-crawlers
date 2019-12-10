@@ -23,7 +23,9 @@ defmodule CrawlerManager.Server do
         {queue_pid, graph_pid, url},
         name: __MODULE__
       )
-    # run(url, 0)
+    PageQueue.get_new_page(queue_pid)
+    |> set_new_url
+    |> run(0)
     {:ok, pid}
   end
 
